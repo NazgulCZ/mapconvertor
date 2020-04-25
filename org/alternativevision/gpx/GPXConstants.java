@@ -1,7 +1,7 @@
 /*
  * GPXConstants.java
  * 
- * Copyright (c) 2012, AlternativeVision. All rights reserved.
+ * Copyright (c) 2012-2013, AlternativeVision. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,15 @@
 package org.alternativevision.gpx;
 
 public interface GPXConstants {
+	/*GPX file header constants*/
+	public static final String XMLNS_ATTR = "xmlns";
+	public static final String XMLNS_1_1_VALUE = "http://www.topografix.com/GPX/1/1";
+	public static final String XMLNS_XSI_ATTR = "xmlns:xsi";
+	public static final String XMLNS_XSI_1_1_VALUE = "http://www.w3.org/2001/XMLSchema-instance";
+	public static final String XMLNS_XSI_SCHEMALOC_ATTR = "xsi:schemaLocation";
+	public static final String XMLNS_XSI_SCHEMALOC_1_1_VALUE = "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd";
+	/*End GPX file header constants*/
+	
 	/*GPX nodes and attributes*/
 	public static final String GPX_NODE = "gpx";
 	public static final String WPT_NODE = "wpt";

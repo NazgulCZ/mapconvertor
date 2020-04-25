@@ -1,7 +1,7 @@
 /*
  * GPXParser.java
  * 
- * Copyright (c) 2012, AlternativeVision. All rights reserved.
+ * Copyright (c) 2012-2013, AlternativeVision. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.TimeZone;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,6 +44,8 @@ import org.alternativevision.gpx.beans.Route;
 import org.alternativevision.gpx.beans.Track;
 import org.alternativevision.gpx.beans.Waypoint;
 import org.alternativevision.gpx.extensions.IExtensionParser;
+import org.alternativevision.gpx.log.FacadeLogger;
+import org.alternativevision.gpx.log.ILogger;
 import org.alternativevision.gpx.types.FixType;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -92,7 +94,7 @@ public class GPXParser {
 		extensionParsers.remove(parser);
 	}
 	
-	private Logger logger = Logger.getLogger(this.getClass().getName()); 
+	private ILogger logger = FacadeLogger.getInstance().getLogger(this.getClass().getName()); 
 	
 	/**
 	 * Parses a stream containing GPX data
@@ -476,35 +478,43 @@ public class GPXParser {
 		Document doc = builder.newDocument();
 		Node gpxNode = doc.createElement(GPXConstants.GPX_NODE);
 		addBasicGPXInfoToNode(gpx, gpxNode, doc);
-
 		if(gpx.getWaypoints() != null) {
+			logger.debug("Waypoints Found. Begin writing data to stream");
 			Iterator<Waypoint> itW = gpx.getWaypoints().iterator();
-			while (itW.hasNext()) {
+			while(itW.hasNext()) {
 				addWaypointToGPXNode(itW.next(), gpxNode, doc);
 			}
+			logger.debug("Waypoints Found. End writing data to stream");
 		}
 		if(gpx.getTracks() != null) {
+			logger.debug("Tracks Found. Begin writing data to stream");
 			Iterator<Track> itT = gpx.getTracks().iterator();
-			while (itT.hasNext()) {
+			while(itT.hasNext()) {
 				addTrackToGPXNode(itT.next(), gpxNode, doc);
 			}
+			logger.debug("Tracks Found. End writing data to stream");
 		}
 		if(gpx.getRoutes() != null) {
+			logger.debug("Routes Found. Begin writing data to stream");
 			Iterator<Route> itR = gpx.getRoutes().iterator();
-			while (itR.hasNext()) {
+			while(itR.hasNext()) {
 				addRouteToGPXNode(itR.next(), gpxNode, doc);
 			}
+			logger.debug("Routes Found. End writing data to stream");
 		}
-
+		
 		doc.appendChild(gpxNode);
 		
+		logger.debug("Initialize transformer");
 		// Use a Transformer for output
 		TransformerFactory tFactory = TransformerFactory.newInstance();
 		Transformer transformer = tFactory.newTransformer();
 		
 		DOMSource source = new DOMSource(doc);
 		StreamResult result = new StreamResult(out);
-		transformer.transform(source, result); 
+		logger.debug("Begin transform");
+		transformer.transform(source, result);
+		logger.debug("End Transform");
 	}
 	
 	private void addWaypointToGPXNode(Waypoint wpt, Node gpxNode, Document doc) {
@@ -532,6 +542,7 @@ public class GPXParser {
 		if(wpt.getTime() != null) {
 			Node node = doc.createElement(GPXConstants.TIME_NODE);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss'Z'");
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 			node.appendChild(doc.createTextNode(sdf.format(wpt.getTime())));
 			wptNode.appendChild(node);
 		}
@@ -676,7 +687,7 @@ public class GPXParser {
 	}
 	
 	private void addRouteToGPXNode(Route rte, Node gpxNode, Document doc) {
-		Node trkNode = doc.createElement(GPXConstants.TRK_NODE);
+		Node trkNode = doc.createElement(GPXConstants.RTE_NODE);
 		
 		if(rte.getName() != null) {
 			Node node = doc.createElement(GPXConstants.NAME_NODE);
@@ -728,6 +739,19 @@ public class GPXParser {
 	
 	private void addBasicGPXInfoToNode(GPX gpx, Node gpxNode, Document doc) {
 		NamedNodeMap attrs = gpxNode.getAttributes();
+		
+		Node xmlnsNode = doc.createAttribute(GPXConstants.XMLNS_ATTR);
+		xmlnsNode.setNodeValue(GPXConstants.XMLNS_1_1_VALUE);
+		attrs.setNamedItem(xmlnsNode);
+		
+		Node xmlnsXsiNode = doc.createAttribute(GPXConstants.XMLNS_XSI_ATTR);
+		xmlnsXsiNode.setNodeValue(GPXConstants.XMLNS_XSI_1_1_VALUE);
+		attrs.setNamedItem(xmlnsXsiNode);
+		
+		Node xmlnsXsiSLocNode = doc.createAttribute(GPXConstants.XMLNS_XSI_SCHEMALOC_ATTR);
+		xmlnsXsiSLocNode.setNodeValue(GPXConstants.XMLNS_XSI_SCHEMALOC_1_1_VALUE);
+		attrs.setNamedItem(xmlnsXsiSLocNode);
+		
 		if(gpx.getVersion() != null) {
 			Node verNode = doc.createAttribute(GPXConstants.VERSION_ATTR);
 			verNode.setNodeValue(gpx.getVersion());

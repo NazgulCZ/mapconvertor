@@ -13,16 +13,23 @@ import java.util.Scanner;
 
 public class MapConvertorConsole {
     static double radius = 50; // in meters
-    private HashMap<String, String> args = new HashMap<String, String>();
-    private org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger("org.nazgul.mapconvertor");
+    private final HashMap<String, String> args = new HashMap<>();
+    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger("org.nazgul.mapconvertor");
 
     String promptForPath(String fileType) {
         System.out.print("Enter " + fileType + " path: ");
         System.out.flush();
 
         Scanner in = new Scanner(System.in);
-        String pathS = in.nextLine();
-        return pathS;
+        return in.nextLine();
+    }
+
+    Boolean canOverwriteFile(Path path) {
+        System.out.print("File " + path.toString() + " already exists. Overwrite [y/N]? ");
+
+        Scanner in = new Scanner(System.in);
+        String choice = in.nextLine().toLowerCase();
+        return choice.startsWith("y");
     }
 
     private void ParseArgs(String[] commandLineArgs)
@@ -41,24 +48,23 @@ public class MapConvertorConsole {
         ParseArgs(args);
     }
 
-
-    Path readPath(String argKey, String fileType, boolean checkFileExists) {
-        return readPath(argKey, fileType, checkFileExists, null);
+    Path readPath(String argKey, String fileType) {
+        return readPath(argKey, fileType, true, null);
     }
 
-    Path readPath(String argKey, String fileType, boolean checkFileExists, Path defaultPath) {
+    Path readPath(String argKey, String fileType, boolean inputFile, Path defaultPath) {
         Path path = null;
-        Boolean correctPath = false;
-        Boolean fileExists = false;
-        Boolean argChecked = false;
+        boolean correctPath = false;
+        boolean fileExists = false;
+        boolean argChecked = false;
 
-        while (!(correctPath && (fileExists || !checkFileExists))) {
+        while (!(correctPath && (fileExists || !inputFile))) {
             String pathS;
             if (!argChecked) {
                 String pathFromArg = args.getOrDefault(argKey, "");
-                if (pathFromArg == "" && defaultPath != null)
+                if (pathFromArg.isBlank()  && defaultPath != null)
                     pathFromArg = defaultPath.toString();
-                if (pathFromArg != "") {
+                if (!pathFromArg.isBlank()) {
                     pathS = pathFromArg;
                     System.out.println(fileType + " is " + pathFromArg);
                 }
@@ -77,12 +83,13 @@ public class MapConvertorConsole {
             catch (Exception ex) {
                 System.out.println("Invalid path");
             }
-            if (correctPath && checkFileExists) {
+            if (correctPath) {
                 fileExists = path.toFile().exists();
-                if (!fileExists)
+                if (inputFile && !fileExists)
                     System.out.println("File " + path.toString() + " does not exist.");
+                if (!inputFile && fileExists && !canOverwriteFile(path))
+                    correctPath = false;
             }
-            // TODO if checkFileExists == false, then check if file exists and let user confirm overwriting
         }
 
         // call getFileName() and get FileName path object
@@ -98,15 +105,16 @@ public class MapConvertorConsole {
 
     public void run() throws Exception {
 
-        Path routeFilePath = readPath("routefile", "route file", true);
-        Path checkpointFilePath = readPath("checkpointfile", "checkpoint file", true);
+        Path routeFilePath = readPath("routefile", "route file");
+        Path checkpointFilePath = readPath("checkpointfile", "checkpoint file");
         Path outputFilePath = readPath("outputfile", "output file", false, getDefaultOutputFile());
+        String argRadius = args.getOrDefault("radius", "50");
         try {
-            double newRadius = Double.parseDouble(args.getOrDefault("radius", "50"));
+            double newRadius = Double.parseDouble(argRadius);
             if (newRadius > 0)
                 radius = newRadius;
         } catch (NumberFormatException e) {
-
+            logger.warn("Error parsing radius value \"" + argRadius + "\", using default value " + radius + ".");
         }
 
         GPXParser p = new GPXParser();

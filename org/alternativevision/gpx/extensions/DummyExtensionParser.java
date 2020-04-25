@@ -35,7 +35,7 @@ public class DummyExtensionParser implements IExtensionParser {
 	}
 
 	public Object parseWaypointExtension(Node node) {
-		return "Parsed WaypoinT data";
+		return "Parsed Waypoint data";
 	}
 
 	public Object parseTrackExtension(Node node) {

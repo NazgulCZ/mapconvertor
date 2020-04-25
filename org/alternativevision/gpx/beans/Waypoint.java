@@ -1,7 +1,7 @@
 /*
  * Waypoint.java
  * 
- * Copyright (c) 2012, AlternativeVision. All rights reserved.
+ * Copyright (c) 2012-2013, AlternativeVision. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -437,5 +437,42 @@ lon="longitudeType [1] ?">
 		}
 		sb.append("]");
 		return sb.toString();
+	}
+	
+	/**
+	 * Computesthe hasCode for this object based on latitude and longitude values
+	 */
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((getLatitude() == null) ? 0 : getLatitude().hashCode());
+		result = prime * result
+				+ ((getLongitude() == null) ? 0 : getLongitude().hashCode());
+		return result;
+	}
+
+	/**
+	 * Compares two {@link Waypoint} objects based on latitude and longitude only
+	 */
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Waypoint other = (Waypoint) obj;
+		if (getLatitude() == null) {
+			if (other.getLatitude() != null)
+				return false;
+		} else if (!getLatitude().equals(other.getLatitude()))
+			return false;
+		if (getLongitude() == null) {
+			if (other.getLongitude() != null)
+				return false;
+		} else if (!getLongitude().equals(other.getLongitude()))
+			return false;
+		return true;
 	}
 }
