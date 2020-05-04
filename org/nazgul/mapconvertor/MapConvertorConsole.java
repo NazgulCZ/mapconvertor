@@ -92,10 +92,6 @@ public class MapConvertorConsole {
             }
         }
 
-        // call getFileName() and get FileName path object
-        Path fileName = path.getFileName();
-
-        // print FileName
         return path;
     }
 

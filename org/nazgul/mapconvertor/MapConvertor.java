@@ -3,16 +3,11 @@ package org.nazgul.mapconvertor;
 import org.alternativevision.gpx.beans.*;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 public class MapConvertor {
 
     private double radius = 50; // in meters
-    private org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger("org.nazgul.mapconvertor");
-
-    public double getRadius() {
-        return radius;
-    }
+    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger("org.nazgul.mapconvertor");
 
     public void setRadius(double radius) {
         this.radius = radius;
@@ -40,15 +35,8 @@ public class MapConvertor {
         return nearest;
     }
 
-    GPXEx getgpxOutput(GPX gpxRoute) {
-        GPXEx gpxOutput = new GPXEx(gpxRoute);
-
-//        // workaround GPX class bugs
-//        HashSet<Waypoint> waypoints = new HashSet<Waypoint>();
-//        gpxOutput.setWaypoints(waypoints);
-//        HashSet<Route> routes = new HashSet<Route>();
-//        gpxOutput.setRoutes(routes);
-        return gpxOutput;
+    GPXEx getGpxOutput(GPX gpxRoute) {
+        return new GPXEx(gpxRoute);
     }
 
     void addCheckpoints(GPX gpxRoute, GPX gpxCheckpoints, GPXEx gpxOutput) {
@@ -84,7 +72,7 @@ public class MapConvertor {
     }
 
     public GPXEx Run(GPX gpxRoute, GPX gpxCheckpoints) /*throws IOException, FileNotFoundException, ParserConfigurationException, TransformerException, SAXException*/ {
-        GPXEx gpxOutput = getgpxOutput(gpxRoute);
+        GPXEx gpxOutput = getGpxOutput(gpxRoute);
 
         addCheckpoints(gpxRoute, gpxCheckpoints, gpxOutput);
 

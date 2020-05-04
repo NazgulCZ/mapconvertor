@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 class WaypointEx extends Waypoint {
     int index = -1;
+
     public int getIndex () {
         return index;
     }
@@ -73,9 +74,9 @@ public class GPXEx extends GPX {
         Track trackSource = tracksSource.iterator().next();
         ArrayList<Waypoint> trackPointsSource = trackSource.getTrackPoints();
 
-        HashSet<Track> tracks = new HashSet<Track>();
+        HashSet<Track> tracks = new HashSet<>();
         Track track = new Track();
-        ArrayList<Waypoint> trackPoints = new ArrayList<Waypoint>();
+        ArrayList<Waypoint> trackPoints = new ArrayList<>();
         int index = 0;
         for (Waypoint trackPointSource : trackPointsSource)
         {
