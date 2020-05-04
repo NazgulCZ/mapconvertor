@@ -13,19 +13,19 @@ public class MapConvertor {
         this.radius = radius;
     }
 
-    double calcDistance(Waypoint wp1, Waypoint wp2) {
-        double deltaLat = Math.toRadians(wp2.getLatitude() - wp1.getLatitude());
-        double deltaLong = Math.toRadians(wp2.getLongitude() - wp1.getLongitude());
-        double a = Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(Math.toRadians(wp1.getLatitude())) * Math.cos(Math.toRadians(wp1.getLatitude())) * Math.pow(Math.sin(deltaLong / 2), 2);
-        double greatCircleDistance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return GPXEx.earthRadius * greatCircleDistance;
-    }
+//    double calcDistance(Waypoint wp1, Waypoint wp2) {
+//        double deltaLat = Math.toRadians(wp2.getLatitude() - wp1.getLatitude());
+//        double deltaLong = Math.toRadians(wp2.getLongitude() - wp1.getLongitude());
+//        double a = Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(Math.toRadians(wp1.getLatitude())) * Math.cos(Math.toRadians(wp1.getLatitude())) * Math.pow(Math.sin(deltaLong / 2), 2);
+//        double greatCircleDistance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//        return GPXEx.earthRadius * greatCircleDistance;
+//    }
 
     Waypoint findNearestWaypoint (Waypoint checkpoint, Track track) {
         Double minDistance = null;
         Waypoint nearest = null;
         for (Waypoint waypoint : track.getTrackPoints()) {
-            double distance = calcDistance(waypoint, checkpoint);
+            double distance = waypoint.distanceTo(checkpoint);
             if (nearest == null || minDistance > distance) {
                 nearest = waypoint;
                 minDistance = distance;
@@ -58,7 +58,7 @@ public class MapConvertor {
             Waypoint nearest = findNearestWaypoint(checkpoint, track);
             if (nearest != null) {
                 double distance;
-                distance = calcDistance(nearest, checkpoint) * 1000;
+                distance = checkpoint.distanceTo(nearest) * 1000;
                 String s;
                 s = String.format("Nearest point %s, distance %.2f m.", nearest.getName(), distance);
                 logger.info(s);

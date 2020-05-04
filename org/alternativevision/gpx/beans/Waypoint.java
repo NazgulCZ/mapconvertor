@@ -101,8 +101,9 @@ lon="longitudeType [1] ?">
 	private Double pdop;
 	private Double ageOfGPSData;
 	private Integer dgpsid;
-	
-	
+
+	public static final double earthRadius = 6378.137; // in meters
+
 	/**
 	 * Returns the latitude of this waypoint.
 	 * @return a Double value representing the latitude of this waypoint.
@@ -460,7 +461,7 @@ lon="longitudeType [1] ?">
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (! (obj instanceof Waypoint))
 			return false;
 		Waypoint other = (Waypoint) obj;
 		if (getLatitude() == null) {
@@ -475,4 +476,30 @@ lon="longitudeType [1] ?">
 			return false;
 		return true;
 	}
+
+	public double distanceTo(Waypoint wp) {
+		double deltaLat = Math.toRadians(wp.getLatitude() - getLatitude());
+		double deltaLong = Math.toRadians(wp.getLongitude() - getLongitude());
+		double a = Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(Math.toRadians(getLatitude())) * Math.cos(Math.toRadians(getLatitude())) * Math.pow(Math.sin(deltaLong / 2), 2);
+		double greatCircleDistance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		return earthRadius * greatCircleDistance;
+	}
+
+	// bearing is in radians, distance is in meters
+	public Waypoint moveTo(double bearing, double distance)
+	{
+		double lat = Math.toRadians(getLatitude());
+		double lon = Math.toRadians(getLongitude());
+
+		double distRadians = distance / (earthRadius * 1000);
+
+		double newLat = Math.asin(Math.sin(lat) * Math.cos(distRadians) + Math.cos(lat) * Math.sin(distRadians) * Math.cos(bearing));
+		double newLon = lon + Math.atan2(Math.sin(bearing) * Math.sin(distRadians) * Math.cos(lat), Math.cos(distRadians) - Math.sin(lat) * Math.sin(newLat));
+
+		Waypoint waypoint = new Waypoint();
+		waypoint.setLatitude(Math.toDegrees(newLat));
+		waypoint.setLongitude(Math.toDegrees(newLon));
+		return waypoint;
+	}
+
 }

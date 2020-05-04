@@ -33,7 +33,7 @@ package org.alternativevision.gpx.types;
  */
 public class FixType {
 	
-	private String value;
+	private final String value;
 	
 	private FixType(String value) {
 		this.value = value;

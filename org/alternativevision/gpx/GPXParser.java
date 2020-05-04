@@ -47,7 +47,6 @@ import org.alternativevision.gpx.extensions.IExtensionParser;
 import org.alternativevision.gpx.log.FacadeLogger;
 import org.alternativevision.gpx.log.ILogger;
 import org.alternativevision.gpx.types.FixType;
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -74,7 +73,7 @@ import org.xml.sax.SAXException;
  */
 public class GPXParser {
 	
-	private ArrayList<IExtensionParser> extensionParsers = new ArrayList<IExtensionParser>();
+	private final ArrayList<IExtensionParser> extensionParsers = new ArrayList<IExtensionParser>();
 	
 	/**
 	 * Adds a new extension parser to be used when parsing a gpx steam
@@ -94,7 +93,7 @@ public class GPXParser {
 		extensionParsers.remove(parser);
 	}
 	
-	private ILogger logger = FacadeLogger.getInstance().getLogger(this.getClass().getName()); 
+	private final ILogger logger = FacadeLogger.getInstance().getLogger(this.getClass().getName());
 	
 	/**
 	 * Parses a stream containing GPX data
